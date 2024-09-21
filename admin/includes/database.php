@@ -20,6 +20,17 @@ class Database{
 
     }
 
+    public function query($sql){
+        $result = mysqli_query($this->connection, $sql);
+
+        if (!$result) {
+            # code...
+            die("Query failed");
+        }
+
+        return $result;
+    }
+
 }
 
 $database = new Database();
