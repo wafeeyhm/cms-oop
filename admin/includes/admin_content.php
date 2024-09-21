@@ -9,15 +9,13 @@
             </h1>
             <?php 
 
-                $found_user = User::find_users_by_id(2);
+                $users = User::find_all_users();
+                
+                foreach ($users as $user) {
+                    # code...
+                    echo $user->username . "<br>";
+                }
 
-                $user = User::instantiation($found_user);
-
-                echo $user->username;
-
-                echo "<br>";
-
-            
             ?>
             <ol class="breadcrumb">
                 <li>
