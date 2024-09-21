@@ -16,9 +16,10 @@ class User{
 
     public static function find_users_by_id($user_id){
         
-        // $result =  self::run_query("SELECT * FROM users WHERE id=$user_id LIMIT 1");
-        // $found_user = mysqli_fetch_array($result);
-        // return $found_user;
+        $result_array =  self::run_query("SELECT * FROM users WHERE id=$user_id LIMIT 1");
+
+        //using ternary
+        return !empty($result_array) ? array_shift($result_array) : false;
 
     }
 

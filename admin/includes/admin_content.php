@@ -9,12 +9,16 @@
             </h1>
             <?php 
 
-                $users = User::find_all_users();
+                // $users = User::find_all_users();
                 
-                foreach ($users as $user) {
-                    # code...
-                    echo $user->username . "<br>";
-                }
+                // foreach ($users as $user) {
+                //     # code...
+                //     echo $user->username . "<br>";
+                // }
+
+                $found_user = User::find_users_by_id(2);
+
+                echo $found_user->username;
 
             ?>
             <ol class="breadcrumb">
