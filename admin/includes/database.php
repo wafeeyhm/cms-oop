@@ -22,7 +22,12 @@ class Database{
     }
 
     public function query($sql){
+
+        $this->escape_string($sql);
+
         $result = $this->connection->query($sql);
+
+        $this->confirm_query($result);
 
         return $result;
     }
@@ -39,7 +44,7 @@ class Database{
 
     public function escape_string($sql){
 
-        $escaped = $this->connection->real_escapae_string($sql);
+        $escaped = $this->connection->real_escape_string($sql);
 
         return $escaped;
     }
