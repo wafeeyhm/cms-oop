@@ -1,7 +1,6 @@
 <?php
-    // Use spl_autoload_register to autoload classes
-    spl_autoload_register(function($class) {
-        
+
+    function autoLoader($class){
         // Convert class name to lowercase
         $class = strtolower($class);
         
@@ -14,6 +13,8 @@
         } else {
             die("This file name {$class}.php was not found");
         }
+    }
 
-    });
+    // Use spl_autoload_register to autoload classes
+    spl_autoload_register("autoLoader");
 ?>
