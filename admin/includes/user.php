@@ -26,21 +26,43 @@ class User{
         
         global $database;
         $result = $database->query($sql);
-        return $result;
+        $object_array = array();
+
+        while ($row = mysqli_fetch_array($result)) {
+            # code...
+            $object_array[] = self::instantiation($row);
+        }
+
+        return $object_array;
     }
 
-    public static function instantiation($found_user){
+    public static function instantiation($record){
 
         $object = new self;
 
-        $object->id  = $found_user['id'];
-        $object->username = $found_user['username'];
-        $object->password = $found_user['password'];
-        $object->first_name = $found_user['first_name'];
-        $object->last_name = $found_user['last_name'];
+        // $object->id  = $found_user['id'];
+        // $object->username = $found_user['username'];
+        // $object->password = $found_user['password'];
+        // $object->first_name = $found_user['first_name'];
+        // $object->last_name = $found_user['last_name'];
+
+        foreach ($record as $attribute => $value) {
+            //check if the object has the property using has_the_attribute()
+            if($object->has_the_attribute($attribute)) {
+                //dynamically assign the value to the correct property
+                $object->$attribute = $value;
+            }
+        }
 
         return $object;
 
+    }
+
+    private function has_the_attribute($attribute){
+        
+        $object_properties = get_object_vars($this);
+
+        return array_key_exists($attribute, $object_properties);
     }
 
 }
