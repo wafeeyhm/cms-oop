@@ -23,7 +23,7 @@ class Database{
     public function query($sql){
         $result = mysqli_query($this->connection, $sql);
 
-        
+        return $result;
     }
 
     private function confirm_query($result){
