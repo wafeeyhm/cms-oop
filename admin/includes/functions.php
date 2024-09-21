@@ -6,11 +6,12 @@
         
         // Define the path to the file
         $path = "includes/{$class}.php";
-        
-        // Check if the file exists and include it
-        if (file_exists($path)) {
-            require_once($path);
-        } else {
+
+        if (is_file($path) && !class_exists($class)) {
+            # code...
+            include $path;
+        }
+        else{
             die("This file name {$class}.php was not found");
         }
     }
