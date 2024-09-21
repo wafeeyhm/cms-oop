@@ -29,6 +29,20 @@ class User{
         return $result;
     }
 
+    public static function instantiation($found_user){
+
+        $object = new self;
+
+        $object->id  = $found_user['id'];
+        $object->username = $found_user['username'];
+        $object->password = $found_user['password'];
+        $object->first_name = $found_user['first_name'];
+        $object->last_name = $found_user['last_name'];
+
+        return $object;
+
+    }
+
 }
 
 ?>
