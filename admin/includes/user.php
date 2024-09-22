@@ -29,8 +29,10 @@ class User{
 
         $username = $database->escape_string($username);
         $password = $database->escape_string($password);
+
+        $sql = "SELECT * FROM users WHERE username ={$username} AND password = {$password} LIMIT 1";
         
-        $result_array =  self::run_query("SELECT * FROM users WHERE username=$username AND password=$password LIMIT 1");
+        $result_array =  self::run_query($sql);
 
         //using ternary
         return !empty($result_array) ? array_shift($result_array) : false;
