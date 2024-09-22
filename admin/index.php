@@ -1,4 +1,10 @@
-<?php include("includes/header.php"); ?>
+<?php 
+
+    include("includes/header.php");
+    
+    if(!$session->is_signed_in()){redirect("login.php");}
+    
+?>
 
         <!-- Navigation -->
         <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
@@ -17,4 +23,4 @@
         </div>
         <!-- /#page-wrapper -->
 
-  <?php include("includes/footer.php"); ?>
+<?php include("includes/footer.php"); ?>

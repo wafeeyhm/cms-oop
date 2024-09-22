@@ -3,11 +3,6 @@
     ob_start();
     require_once("init.php");
 
-    if (!$session->is_signed_in()) {
-        # code...
-        redirect("login.php");
-    }
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
