@@ -30,7 +30,7 @@ class User{
         $username = $database->escape_string($username);
         $password = $database->escape_string($password);
 
-        $sql = "SELECT * FROM users WHERE username ={$username} AND password = {$password} LIMIT 1";
+        $sql = "SELECT * FROM users WHERE username ='{$username}' AND password = '{$password}' LIMIT 1";
         
         $result_array =  self::run_query($sql);
 
