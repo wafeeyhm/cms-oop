@@ -23,6 +23,20 @@ class User{
 
     }
 
+    public static function verify_user($username, $password){
+
+        global $database;
+
+        $username = $database->escape_string($username);
+        $password = $database->escape_string($password);
+        
+        $result_array =  self::run_query("SELECT * FROM users WHERE username=$username AND password=$password LIMIT 1");
+
+        //using ternary
+        return !empty($result_array) ? array_shift($result_array) : false;
+
+    }
+
     public static function run_query($sql){
         
         global $database;
