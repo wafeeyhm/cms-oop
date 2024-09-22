@@ -16,6 +16,12 @@
         }
     }
 
+    function redirect($location){
+        
+        header("Location: {$location}");
+
+    }
+
     // Use spl_autoload_register to autoload classes
     spl_autoload_register("autoLoader");
 ?>
