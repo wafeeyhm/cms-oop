@@ -30,12 +30,42 @@ class User{
         $username = $database->escape_string($username);
         $password = $database->escape_string($password);
 
-        $sql = "SELECT * FROM users WHERE username ='{$username}' AND password = '{$password}' LIMIT 1";
+        $sql = "SELECT * FROM users WHERE username ='{$username}' AND password = '{$password}'   LIMIT 1";
         
         $result_array =  self::run_query($sql);
 
         //using ternary
         return !empty($result_array) ? array_shift($result_array) : false;
+
+    }
+
+    //start CRUD
+    //create method
+    public function create(){
+
+        global $database;
+
+        //insert sql
+        $sql = "INSERT INTO users (username, password, first_name, last_name)";
+        $sql .= "VALUES ('";
+        $sql .= $database->escape_string($this->username) . "','";
+        $sql .= $database->escape_string($this->password) . "','";
+        $sql .= $database->escape_string($this->first_name) . "','";
+        $sql .= $database->escape_string($this->last_name) . "')";
+
+        if ($database->query($sql)) {
+            # code...
+
+            $this->id = $database->the_insert_id();
+
+            return true;
+
+        } else {
+            # code...
+
+            return false;
+
+        }
 
     }
 
