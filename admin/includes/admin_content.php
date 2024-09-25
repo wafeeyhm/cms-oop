@@ -7,16 +7,14 @@
                 Blank Page
                 <small>Subheading</small>
             </h1>
-            <?php 
+            <?php
+            
+                $user = User::find_users_by_id(4);
 
                 $user = new User();
+                $user->last_name = "Wilson";
 
-                $user->username = "colossus";
-                $user->password = "pass123";
-                $user->first_name ="Stefan";
-                $user->last_name = "Kapicic";
-
-                $user->create();
+                $user->update();
 
 
             ?>
