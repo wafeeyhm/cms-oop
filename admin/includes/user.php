@@ -51,13 +51,11 @@ class User{
 
         global $database;
 
+        $properties = $this->properties();
+
         //insert sql
-        $sql = "INSERT INTO " .self::$db_table ." (username, password, first_name, last_name)";
-        $sql .= "VALUES ('";
-        $sql .= $database->escape_string($this->username) . "','";
-        $sql .= $database->escape_string($this->password) . "','";
-        $sql .= $database->escape_string($this->first_name) . "','";
-        $sql .= $database->escape_string($this->last_name) . "')";
+        $sql = "INSERT INTO " .self::$db_table ."(" . implode(",",array_keys($properties)) .")";
+        $sql .= "VALUES ('" . implode("','",array_keys($properties)) . "')";
 
         if ($database->query($sql)) {
             # code...
@@ -110,6 +108,12 @@ class User{
     }
 
     //end CRUD
+
+    protected function properties(){
+
+        return get_object_vars($this);
+
+    }
 
     public static function run_query($sql){
         
