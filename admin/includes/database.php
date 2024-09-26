@@ -10,20 +10,28 @@ class Database{
         $this->open_db_connection();
     }
 
+    // Open a database connection
     public function open_db_connection(){
 
         $this->connection = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
+        // Check for connection errors
         if ($this->connection->connect_errno) {
-            # code...
-            die("Database connection failed" . $this->connection->connect_error);
+            throw new Exception("Database connection failed: " . $this->connection->connect_error);
         }
 
     }
 
+    // Close the database connection
+    public function close_db_connection() {
+        if ($this->connection) {
+            $this->connection->close();
+        }
+    }
+
     public function query($sql){
 
-        $this->escape_string($sql);
+        $this->connection->prepare($sql);
 
         $result = $this->connection->query($sql);
 
@@ -42,11 +50,11 @@ class Database{
         return $result;
     }
 
-    public function escape_string($sql){
+    // Escape string (for cases where prepared statements can't be used)
+    public function escape_string($value) {
 
-        $escaped = $this->connection->real_escape_string($sql);
-
-        return $escaped;
+        return $this->connection->real_escape_string($value);
+        
     }
 
     public function the_insert_id(){
@@ -55,6 +63,7 @@ class Database{
 
 }
 
+// Instantiate the database class
 $database = new Database();
 
 ?>

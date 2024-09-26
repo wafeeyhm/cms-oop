@@ -11,10 +11,7 @@
             
                 $user = User::find_users_by_id(4);
 
-                $user = new User();
-                $user->last_name = "Wilson";
-
-                $user->update();
+                $user->delete();
 
 
             ?>
