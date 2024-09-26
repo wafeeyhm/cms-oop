@@ -3,6 +3,7 @@
 class User{
 
     protected static $db_table = "users";
+    protected static $db_table_fields = array('username', 'password', 'first_name', 'last_name');
     public $id;
     public $username;
     public $password;
@@ -55,7 +56,7 @@ class User{
 
         //insert sql
         $sql = "INSERT INTO " .self::$db_table ."(" . implode(",",array_keys($properties)) .")";
-        $sql .= "VALUES ('" . implode("','",array_keys($properties)) . "')";
+        $sql .= "VALUES ('" . implode("','",array_values($properties)) . "')";
 
         if ($database->query($sql)) {
             # code...
@@ -111,7 +112,20 @@ class User{
 
     protected function properties(){
 
-        return get_object_vars($this);
+        // return get_object_vars($this);
+
+        $properties = array();
+
+        foreach (self::$db_table_fields as $db_field) {
+            # code...
+            if (property_exists($this, $db_field)) {
+
+                # code...
+                $properties[$db_field] = $this->$db_field;
+            }
+        }
+
+        return $properties;
 
     }
 
