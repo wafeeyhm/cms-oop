@@ -32,7 +32,7 @@ class User{
 
         $sql = "SELECT * FROM users WHERE username ='{$username}' AND password = '{$password}'   LIMIT 1";
         
-        $result_array =  self::run_query($sql);
+        $result_array = self::run_query($sql);
 
         //using ternary
         return !empty($result_array) ? array_shift($result_array) : false;
@@ -40,6 +40,10 @@ class User{
     }
 
     //start CRUD
+
+    public function save(){
+        return isset($this->id) ? $this->update() : $this->create();
+    }
 
     //create method
     public function create(){
@@ -89,13 +93,14 @@ class User{
         
     }
 
+    //delete method
+
     public function delete(){
 
         global $database;
 
         $sql = "DELETE FROM users ";
-        $sql .= "WHERE id=" . $database->escape_string($this->id);
-        $sql .= " LIMIT 1";
+        $sql .= "WHERE id=" . $database->escape_string($this->id) . " LIMIT 1";
 
         $database->query($sql);
 
