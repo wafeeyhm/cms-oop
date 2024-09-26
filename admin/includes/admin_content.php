@@ -9,17 +9,18 @@
             </h1>
             <?php
             
-                // $user = new User();
-                // $user->username = "cakey";
-                // $user->password = "pass123";
-                // $user->first_name = "James";
-                // $user->last_name = "Howlett";
+                $user = new User();
+                $user->username = "chase";
+                $user->password = "pass123";
+                $user->first_name = "James";
+                $user->last_name = "Howlett";
 
-                // $user->save();
-
-                $user = User::find_users_by_id(7);
-                $user->username = "gabby";
                 $user->save();
+
+                // $user = User::find_users_by_id(7);
+                // $user->username = "gabby";
+                // $user->password = "123456";
+                // $user->save();
 
 
             ?>

@@ -52,7 +52,7 @@ class User{
 
         global $database;
 
-        $properties = $this->properties();
+        $properties = $this->clean_properties();
 
         //insert sql
         $sql = "INSERT INTO " .self::$db_table ."(" . implode(",",array_keys($properties)) .")";
@@ -80,7 +80,7 @@ class User{
 
         global $database;
 
-        $properties = $this->properties();
+        $properties = $this->clean_properties();
 
         $properties_pairs = array();
 
@@ -132,6 +132,21 @@ class User{
         }
 
         return $properties;
+
+    }
+
+    protected function clean_properties(){
+
+        global $database;
+
+        $clean_properties = array();
+
+        foreach ($this->properties() as $key => $value) {
+            # code...
+            $clean_properties[$key] = $database->escape_string($value);
+        }
+
+        return $clean_properties;
 
     }
 
