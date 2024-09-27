@@ -5,18 +5,93 @@ class Db_object{
 
     public static function find_all(){
         
-        return self::run_query("SELECT * FROM " .self::$db_table ." ");
+        return static::run_query("SELECT * FROM " .static::$db_table ." ");
 
     }
 
     public static function find_by_id($user_id){
         
-        $result_array =  self::run_query("SELECT * FROM " .self::$db_table ." WHERE id=$user_id LIMIT 1");
+        $result_array =  static::run_query("SELECT * FROM " .static::$db_table ." WHERE id=$user_id LIMIT 1");
 
         //using ternary
         return !empty($result_array) ? array_shift($result_array) : false;
 
     }
+
+    //start CRUD
+
+    public function save(){
+        return isset($this->id) ? $this->update() : $this->create();
+    }
+
+    //create method
+    public function create(){
+
+        global $database;
+
+        $properties = $this->clean_properties();
+
+        //insert sql
+        $sql = "INSERT INTO " .static::$db_table ."(" . implode(",",array_keys($properties)) .")";
+        $sql .= "VALUES ('" . implode("','",array_values($properties)) . "')";
+
+        if ($database->query($sql)) {
+            # code...
+
+            $this->id = $database->the_insert_id();
+
+            return true;
+
+        } else {
+            # code...
+
+            return false;
+
+        }
+
+    }
+
+    //update method
+
+    public function update(){
+
+        global $database;
+
+        $properties = $this->clean_properties();
+
+        $properties_pairs = array();
+
+        foreach ($properties as $key => $value) {
+            # code...
+            $properties_pairs[] = "{$key}='" . $database->escape_string($value) . "'";
+        }
+
+        $sql = "UPDATE " .static::$db_table ." SET ";
+        $sql .= implode(", ", $properties_pairs);
+        $sql .= "WHERE id=" . $database->escape_string($this->id);
+
+        $database->query($sql);
+
+        return (mysqli_affected_rows($database->connection) == 1) ? true : false;
+        
+    }
+
+    //delete method
+
+    public function delete(){
+
+        global $database;
+
+        $sql = "DELETE FROM " .static::$db_table ." ";
+        $sql .= "WHERE id=" . $database->escape_string($this->id) . " LIMIT 1";
+
+        $database->query($sql);
+
+        return (mysqli_affected_rows($database->connection) == 1) ? true : false;
+
+    }
+
+    //end CRUD
 
     public static function run_query($sql){
         
@@ -26,7 +101,7 @@ class Db_object{
 
         while ($row = mysqli_fetch_array($result)) {
             # code...
-            $object_array[] = self::instantiation($row);
+            $object_array[] = static::instantiation($row);
         }
 
         return $object_array;
@@ -34,7 +109,9 @@ class Db_object{
 
     public static function instantiation($record){
 
-        $object = new self;
+        $calling_class = get_called_class();
+
+        $object = new $calling_class;
 
         foreach ($record as $attribute => $value) {
             //check if the object has the property using has_the_attribute()
@@ -61,7 +138,7 @@ class Db_object{
 
         $properties = array();
 
-        foreach (self::$db_table_fields as $db_field) {
+        foreach (static::$db_table_fields as $db_field) {
             # code...
             if (property_exists($this, $db_field)) {
 
