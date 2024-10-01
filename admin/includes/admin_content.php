@@ -9,18 +9,24 @@
             </h1>
             <?php
             
-                $user = new User();
-                $user->username = "chase";
-                $user->password = "pass123";
-                $user->first_name = "James";
-                $user->last_name = "Howlett";
+                // $user = new User();
+                // $user->username = "chase";
+                // $user->password = "pass123";
+                // $user->first_name = "James";
+                // $user->last_name = "Howlett";
 
-                $user->save();
+                // $user->save();
 
                 // $user = User::find_users_by_id(7);
                 // $user->username = "gabby";
                 // $user->password = "123456";
                 // $user->save();
+
+                $photos = Photo::find_all();
+                foreach ($photos as $photo) {
+                    # code...
+                    echo $photo->title;
+                }
 
 
             ?>
