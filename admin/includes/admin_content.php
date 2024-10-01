@@ -28,13 +28,15 @@
                 //     echo $photo->title;
                 // }
 
-                $photo = new Photo();
-                $photo->title = "chase";
-                $photo->description = "pass123";
-                $photo->type = "PNG";
-                $photo->size = "200";
+                // $photo = new Photo();
+                // $photo->title = "chase";
+                // $photo->description = "pass123";
+                // $photo->type = "PNG";
+                // $photo->size = "200";
 
-                $photo->save();
+                // $photo->save();
+
+                echo INCLUDES_PATH;
 
 
             ?>
