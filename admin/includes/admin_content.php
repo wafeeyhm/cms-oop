@@ -22,11 +22,19 @@
                 // $user->password = "123456";
                 // $user->save();
 
-                $photos = Photo::find_all();
-                foreach ($photos as $photo) {
-                    # code...
-                    echo $photo->title;
-                }
+                // $photos = Photo::find_all();
+                // foreach ($photos as $photo) {
+                //     # code...
+                //     echo $photo->title;
+                // }
+
+                $photo = new Photo();
+                $photo->title = "chase";
+                $photo->description = "pass123";
+                $photo->type = "PNG";
+                $photo->size = "200";
+
+                $photo->save();
 
 
             ?>

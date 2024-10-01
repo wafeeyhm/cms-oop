@@ -1,171 +1,160 @@
 <?php
 
-class Db_object{
+class Db_object {
 
+    // Abstract method: Must be overridden in child classes
+    protected static $db_table;
+    protected static $db_table_fields;
 
-    public static function find_all(){
-        
-        return static::run_query("SELECT * FROM " .static::$db_table ." ");
-
+    // General find methods
+    public static function find_all() {
+        return static::run_query("SELECT * FROM " . static::$db_table);
     }
 
-    public static function find_by_id($user_id){
-        
-        $result_array =  static::run_query("SELECT * FROM " .static::$db_table ." WHERE id=$user_id LIMIT 1");
-
-        //using ternary
+    public static function find_by_id($id) {
+        $result_array = static::run_query("SELECT * FROM " . static::$db_table . " WHERE id=? LIMIT 1", 'i', [$id]);
         return !empty($result_array) ? array_shift($result_array) : false;
-
     }
 
-    //start CRUD
-
-    public function save(){
+    // Save (either create or update)
+    public function save() {
         return isset($this->id) ? $this->update() : $this->create();
     }
 
-    //create method
-    public function create(){
-
+    // Create method using prepared statements
+    protected function create() {
         global $database;
 
         $properties = $this->clean_properties();
+        $fields = implode(", ", array_keys($properties));
+        $placeholders = implode(", ", array_fill(0, count($properties), "?"));
+        $values = array_values($properties);
+        $types = $this->get_param_types($values);
 
-        //insert sql
-        $sql = "INSERT INTO " .static::$db_table ."(" . implode(",",array_keys($properties)) .")";
-        $sql .= "VALUES ('" . implode("','",array_values($properties)) . "')";
+        $sql = "INSERT INTO " . static::$db_table . " ($fields) VALUES ($placeholders)";
 
-        if ($database->query($sql)) {
-            # code...
-
+        if ($database->query($sql, $types, $values)) {
             $this->id = $database->the_insert_id();
-
             return true;
-
         } else {
-            # code...
-
             return false;
-
         }
-
     }
 
-    //update method
-
-    public function update(){
-
+    // Update method using prepared statements
+    protected function update() {
         global $database;
 
         $properties = $this->clean_properties();
-
         $properties_pairs = array();
+        $values = array();
 
         foreach ($properties as $key => $value) {
-            # code...
-            $properties_pairs[] = "{$key}='" . $database->escape_string($value) . "'";
+            $properties_pairs[] = "{$key}=?";
+            $values[] = $value;
         }
 
-        $sql = "UPDATE " .static::$db_table ." SET ";
-        $sql .= implode(", ", $properties_pairs);
-        $sql .= "WHERE id=" . $database->escape_string($this->id);
+        // Append 'id' to query
+        $values[] = $this->id;
+        $types = $this->get_param_types($values);
 
-        $database->query($sql);
+        $sql = "UPDATE " . static::$db_table . " SET " . implode(", ", $properties_pairs) . " WHERE id=?";
 
-        return (mysqli_affected_rows($database->connection) == 1) ? true : false;
-        
+        $database->query($sql, $types, $values);
+
+        return ($database->affected_rows() == 1);
     }
 
-    //delete method
-
-    public function delete(){
-
+    // Delete method using prepared statements
+    public function delete() {
         global $database;
 
-        $sql = "DELETE FROM " .static::$db_table ." ";
-        $sql .= "WHERE id=" . $database->escape_string($this->id) . " LIMIT 1";
+        $sql = "DELETE FROM " . static::$db_table . " WHERE id=? LIMIT 1";
+        $database->query($sql, 'i', [$this->id]);
 
-        $database->query($sql);
-
-        return (mysqli_affected_rows($database->connection) == 1) ? true : false;
-
+        return ($database->affected_rows() == 1);
     }
 
-    //end CRUD
-
-    public static function run_query($sql){
-        
+    // Execute query with optional prepared statement parameters
+    public static function run_query($sql, $types = null, $params = []) {
         global $database;
-        $result = $database->query($sql);
-        $object_array = array();
+        $result = $database->query($sql, $types, $params);
+        $object_array = [];
 
-        while ($row = mysqli_fetch_array($result)) {
-            # code...
+        while ($row = $result->fetch_assoc()) {
             $object_array[] = static::instantiation($row);
         }
 
         return $object_array;
     }
 
-    public static function instantiation($record){
-
+    // Instantiate an object based on the query result
+    public static function instantiation($record) {
         $calling_class = get_called_class();
-
         $object = new $calling_class;
 
         foreach ($record as $attribute => $value) {
-            //check if the object has the property using has_the_attribute()
-            if($object->has_the_attribute($attribute)) {
-                //dynamically assign the value to the correct property
+            if ($object->has_the_attribute($attribute)) {
                 $object->$attribute = $value;
             }
         }
 
         return $object;
-
     }
 
-    private function has_the_attribute($attribute){
-        
+    // Check if the object has a particular attribute
+    private function has_the_attribute($attribute) {
         $object_properties = get_object_vars($this);
-
         return array_key_exists($attribute, $object_properties);
     }
 
-    protected function properties(){
-
-        // return get_object_vars($this);
-
-        $properties = array();
-
+    // Return an array of object properties (based on $db_table_fields)
+    protected function properties() {
+        $properties = [];
         foreach (static::$db_table_fields as $db_field) {
-            # code...
             if (property_exists($this, $db_field)) {
-
-                # code...
                 $properties[$db_field] = $this->$db_field;
             }
         }
-
         return $properties;
-
     }
 
-    protected function clean_properties(){
-
+    // Clean object properties (sanitize them)
+    protected function clean_properties() {
         global $database;
-
-        $clean_properties = array();
+        $clean_properties = [];
 
         foreach ($this->properties() as $key => $value) {
-            # code...
-            $clean_properties[$key] = $database->escape_string($value);
+            
+            if ($value === null) {
+                # code...
+                $clean_properties[$key] = null; // you can assign NULL to be used in SQL Query
+            } else {
+                # code...
+                $clean_properties[$key] = $database->escape_string($value);
+            }
+             
         }
 
         return $clean_properties;
-
     }
 
+    // Get parameter types for prepared statements
+    private function get_param_types($values) {
+        $types = '';
+        foreach ($values as $value) {
+            if (is_int($value)) {
+                $types .= 'i';
+            } elseif (is_double($value)) {
+                $types .= 'd';
+            } elseif (is_string($value)) {
+                $types .= 's';
+            } else {
+                $types .= 'b'; // blob or other data
+            }
+        }
+        return $types;
+    }
 }
 
 ?>
