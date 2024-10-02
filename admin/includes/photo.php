@@ -13,9 +13,9 @@ class Photo extends Db_object {
 
     public $tmp_path;
     public $upload_directory = "images";
-    public $errors = [];
-    public $upload_errors_array = [
-        UPLOAD_ERR_OK => "No error, the file uploaded successfully.",
+    public $errors = array();
+    public $upload_errors_array = array(
+        UPLOAD_ERR_OK => "No error, the file uploaded with success.",
         UPLOAD_ERR_INI_SIZE => "The uploaded file exceeds the upload_max_filesize directive in php.ini.",
         UPLOAD_ERR_FORM_SIZE => "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.",
         UPLOAD_ERR_PARTIAL => "The uploaded file was only partially uploaded.",
@@ -23,14 +23,12 @@ class Photo extends Db_object {
         UPLOAD_ERR_NO_TMP_DIR => "Missing a temporary folder.",
         UPLOAD_ERR_CANT_WRITE => "Failed to write file to disk.",
         UPLOAD_ERR_EXTENSION => "File upload stopped by a PHP extension."
-    ];
+    );
 
-    /**
-     * Set file properties
-     */
+    // Setting files for upload
     public function set_files($file) {
-        if (!$file || empty($file) || !is_array($file)) {
-            $this->errors[] = "No file uploaded.";
+        if (empty($file) || !$file || !is_array($file)) {
+            $this->errors[] = "There was no file uploaded here.";
             return false;
         } elseif ($file['error'] != 0) {
             $this->errors[] = $this->upload_errors_array[$file['error']];
@@ -40,17 +38,19 @@ class Photo extends Db_object {
             $this->tmp_path = $file['tmp_name'];
             $this->type = $file['type'];
             $this->size = $file['size'];
+            return true;
         }
     }
 
-    /**
-     * Save the photo
-     */
+    // Saving file and database entry
     public function save() {
         if ($this->photo_id) {
+            // Update existing record
             return $this->update();
         } else {
+            // Debug: Check for errors before continuing
             if (!empty($this->errors)) {
+                echo "Errors found before saving: " . print_r($this->errors, true) . "<br>"; // Debug output
                 return false;
             }
 
@@ -59,7 +59,11 @@ class Photo extends Db_object {
                 return false;
             }
 
+            // Set the target path for the file
             $target_path = SITE_ROOT . DS . 'admin' . DS . $this->upload_directory . DS . $this->filename;
+
+            // Debug: Output the target path for verification
+            echo "Target path: {$target_path}<br>";
 
             // Check if the file already exists
             if (file_exists($target_path)) {
@@ -67,48 +71,25 @@ class Photo extends Db_object {
                 return false;
             }
 
-            // Move the file
+            // Attempt to move the uploaded file
             if (move_uploaded_file($this->tmp_path, $target_path)) {
+                echo "File successfully moved to {$target_path}<br>"; // Debug output
+
                 if ($this->create()) {
-                    unset($this->tmp_path); // clear temp path after upload
+                    // If successfully created in the database
+                    unset($this->tmp_path);
                     return true;
+                } else {
+                    // Debug: Database save issue
+                    echo "Failed to save in database.<br>";
                 }
             } else {
-                $this->errors[] = "The file directory does not have the required permissions.";
+                $this->errors[] = "The file upload failed (unable to move file).";
                 return false;
             }
         }
     }
-
-    /**
-     * Delete the photo file from the directory
-     */
-    public function delete_photo() {
-        if ($this->delete()) {
-            $target_path = SITE_ROOT . DS . 'admin' . DS . $this->upload_directory . DS . $this->filename;
-            return unlink($target_path) ? true : false;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Display the path of the photo
-     */
-    public function picture_path() {
-        return $this->upload_directory . DS . $this->filename;
-    }
-
-    /**
-     * Return a short description or caption of the photo
-     */
-    public function get_short_description($length = 30) {
-        if (strlen($this->description) > $length) {
-            return substr($this->description, 0, $length) . "...";
-        } else {
-            return $this->description;
-        }
-    }
 }
+
 
 ?>
