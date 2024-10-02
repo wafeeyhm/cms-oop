@@ -8,9 +8,19 @@
 
     $message = ""; // Initialize the message variable
 
+    // Check if form has been submitted
     if (isset($_POST['submit'])) {
+        echo "Form has been submitted!<br>"; // Debug: Check if the form was submitted
+
         $photo = new Photo();
         $photo->title = $_POST['title'];
+
+        // Debug: Check if the file array is being processed
+        if (isset($_FILES['file_upload'])) {
+            echo "File upload is detected!<br>";
+        } else {
+            echo "No file upload detected!<br>";
+        }
 
         // Call set_files to validate and set the file upload details
         $photo->set_files($_FILES['file_upload']);
@@ -19,8 +29,18 @@
         if ($photo->save()) {
             $message = "<div class='alert alert-success'>Photo uploaded successfully!</div>";
         } else {
-            $message = "<div class='alert alert-danger'>" . join("<br>", $photo->errors) . "</div>";
+            // Debug: Check if errors are being populated
+            echo "Errors detected in the photo upload process!<br>";
+
+            if (!empty($photo->errors)) {
+                echo "Errors: " . print_r($photo->errors, true) . "<br>"; // Debugging output
+                $message = "<div class='alert alert-danger'>" . join("<br>", $photo->errors) . "</div>";
+            } else {
+                echo "No specific error found, but the upload failed.<br>";
+            }
         }
+    } else {
+        echo "Form not submitted!<br>"; // Debug: Check if the form was not submitted
     }
 ?>
 
@@ -47,6 +67,8 @@
                         // Ensure the message is output only if it's not empty
                         if(!empty($message)) {
                             echo $message;
+                        } else {
+                            echo "No message generated.<br>"; // Debug: Message was not set
                         }
                     ?>
 
