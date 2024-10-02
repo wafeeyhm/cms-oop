@@ -3,6 +3,11 @@
 
     if(!$session->is_signed_in()){redirect("login.php");}
 
+    if (isset($_POST['submit'])) {
+        # code...
+        echo "<h1>Hello</h1>";
+    }
+
 ?>
 
         <!-- Navigation -->
@@ -34,7 +39,7 @@
                             <div class="form-group">
                                 <input type="file" name="file_upload" id="file_upload">
                             </div>
-                            <input type="submit" value="submit">
+                            <input type="submit" name="submit" value="submit">
                         </form>
                     </div>
 
