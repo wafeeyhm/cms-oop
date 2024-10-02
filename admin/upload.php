@@ -1,56 +1,80 @@
 <?php 
     include("includes/header.php"); 
 
-    if(!$session->is_signed_in()){redirect("login.php");}
-
-    if (isset($_POST['submit'])) {
-        # code...
-        echo "<h1>Hello</h1>";
+    // Ensure the user is signed in before allowing uploads
+    if(!$session->is_signed_in()) { 
+        redirect("login.php");
     }
 
+    $message = ""; // Initialize the message variable
+
+    if (isset($_POST['submit'])) {
+        $photo = new Photo();
+        $photo->title = $_POST['title'];
+
+        // Call set_files to validate and set the file upload details
+        $photo->set_files($_FILES['file_upload']);
+
+        // Attempt to save the photo, if successful display success message, else display errors
+        if ($photo->save()) {
+            $message = "<div class='alert alert-success'>Photo uploaded successfully!</div>";
+        } else {
+            $message = "<div class='alert alert-danger'>" . join("<br>", $photo->errors) . "</div>";
+        }
+    }
 ?>
 
-        <!-- Navigation -->
-        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <?php include("includes/top_nav.php"); ?>
-            <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
-            <?php include("includes/side_nav.php"); ?>
-            <!-- /.navbar-collapse -->
-        </nav>
+<!-- Navigation -->
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <?php include("includes/top_nav.php"); ?>
+    <?php include("includes/side_nav.php"); ?>
+</nav>
 
-        <div id="page-wrapper">
+<div id="page-wrapper">
+    <div class="container-fluid">
 
-        <div class="container-fluid">
+        <!-- Page Heading -->
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">
+                    Upload Photo
+                    <small>Upload your images here</small>
+                </h1>
 
-            <!-- Page Heading -->
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">
-                        Upload
-                        <small>Subheading</small>
-                    </h1>
+                <div class="col-md-6">
+                    <!-- Display success or error messages -->
+                    <?php 
+                        // Ensure the message is output only if it's not empty
+                        if(!empty($message)) {
+                            echo $message;
+                        }
+                    ?>
 
-                    <div class="col-md-6">
-                        <form action="upload.php" method="post" enctype="multipart/form-data">
-                            <div class="form-group">
-                                <input type="text" name="title" id="title" required class="form-control">
-                            </div>
-                            <div class="form-group">
-                                <input type="file" name="file_upload" id="file_upload">
-                            </div>
-                            <input type="submit" name="submit" value="submit">
-                        </form>
-                    </div>
+                    <!-- Photo Upload Form -->
+                    <form action="upload.php" method="post" enctype="multipart/form-data">
+                        
+                        <div class="form-group">
+                            <label for="title">Photo Title</label>
+                            <input type="text" name="title" id="title" required class="form-control" placeholder="Enter photo title">
+                        </div>
 
+                        <div class="form-group">
+                            <label for="file_upload">Select Photo</label>
+                            <input type="file" name="file_upload" id="file_upload" required class="form-control-file">
+                        </div>
+
+                        <div class="form-group">
+                            <input type="submit" name="submit" value="Upload Photo" class="btn btn-primary">
+                        </div>
+                    </form>
                 </div>
             </div>
-            <!-- /.row -->
-
-            </div>
-            <!-- /.container-fluid -->
-
         </div>
-        <!-- /#page-wrapper -->
+        <!-- /.row -->
 
-  <?php include("includes/footer.php"); ?>
+    </div>
+    <!-- /.container-fluid -->
+</div>
+<!-- /#page-wrapper -->
+
+<?php include("includes/footer.php"); ?>
